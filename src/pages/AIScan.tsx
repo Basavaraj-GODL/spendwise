@@ -115,18 +115,20 @@ function suggestCategory(text: string): string {
 
 
 function parseTransaction(text: string) {
-  const normalizedText = text.replace(/\u00A0/g, ' ')
+  const normalizedText = text
+    .replace(/\u00A0/g, ' ')
+    .replace(/[₹]/g, '₹')
+
   const lines = normalizedText
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean)
 
-  // Try currency-marked amounts first.
-  
+  // Detect amounts written with a currency symbol or label.
   const amountPatterns = [
-    /₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
-    /(?:rs\.?|inr)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
-    /\b([0-9,]+(?:\.[0-9]{1,2})?)\s*(?:rupees|inr|rs\.?)\b/i,
+    /₹\s*([0-9]+(?:,[0-9]{3})*(?:\.[0-9]{1,2})?)/i,
+    /\b(?:rs\.?|inr)\s*([0-9]+(?:,[0-9]{3})*(?:\.[0-9]{1,2})?)/i,
+    /\b([0-9]+(?:,[0-9]{3})*(?:\.[0-9]{1,2})?)\s*(?:rupees|inr|rs\.?)\b/i,
   ]
 
   let amount = ''
@@ -138,7 +140,6 @@ function parseTransaction(text: string) {
       break
     }
   }
-
 
   const lower = normalizedText.toLowerCase()
 
@@ -170,7 +171,6 @@ function parseTransaction(text: string) {
 
   let title = ''
 
-  // Prefer a name explicitly associated with the payment.
   for (let i = 0; i < lines.length; i++) {
     const label = lines[i].match(
       /^(?:paid to|sent to|received from|payment to|payment from|to|from)\s*[:\-]?\s*(.*)$/i
@@ -184,7 +184,6 @@ function parseTransaction(text: string) {
       break
     }
 
-    // Sometimes OCR places the label and name on separate lines.
     for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
       const nextTitle = isValidTitle(lines[j])
       if (nextTitle) {
@@ -196,7 +195,6 @@ function parseTransaction(text: string) {
     if (title) break
   }
 
-  // Fallback: skip the first line, which may be a screen heading or app name.
   if (!title) {
     title = lines.slice(1).map(isValidTitle).find(Boolean) || ''
   }
@@ -271,7 +269,7 @@ export default function AIScan() {
       const result = await worker.recognize(file)
       const text = result.data.text.trim()
       setRawText(text)
-      console.log(text)
+      
 
       if (!text) {
         setError('No readable text found. Try a clearer screenshot.')
