@@ -266,10 +266,50 @@ export default function AIScan() {
         },
       })
 
-      const result = await worker.recognize(file)
-      const text = result.data.text.trim()
-      setRawText(text)
-      
+     const result = await worker.recognize(file)
+let text = result.data.text.trim()
+
+// If the first scan misses the amount, retry with a clearer image.
+const hasAmount = /₹\s*\d|(?:rs\.?|inr)\s*\d/i.test(text)
+
+if (!hasAmount) {
+  const image = new Image()
+  const imageUrl = URL.createObjectURL(file)
+
+  try {
+    text = await new Promise<string>((resolve, reject) => {
+      image.onload = async () => {
+        try {
+          const canvas = document.createElement('canvas')
+          const scale = Math.max(2, 1600 / image.width)
+
+          canvas.width = Math.round(image.width * scale)
+          canvas.height = Math.round(image.height * scale)
+
+          const context = canvas.getContext('2d')
+          if (!context) {
+            reject(new Error('Could not prepare the image'))
+            return
+          }
+
+          context.drawImage(image, 0, 0, canvas.width, canvas.height)
+
+          const retry = await worker!.recognize(canvas)
+          resolve(retry.data.text.trim())
+        } catch (error) {
+          reject(error)
+        }
+      }
+
+      image.onerror = () => reject(new Error('Could not load image'))
+      image.src = imageUrl
+    })
+  } finally {
+    URL.revokeObjectURL(imageUrl)
+  }
+}
+
+setRawText(text)
 
       if (!text) {
         setError('No readable text found. Try a clearer screenshot.')
