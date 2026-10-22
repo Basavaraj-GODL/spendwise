@@ -113,29 +113,34 @@ function suggestCategory(text: string): string {
   return 'Other'
 }
 
+
 function parseTransaction(text: string) {
+  const normalizedText = text.replace(/\u00A0/g, ' ')
+  const lines = normalizedText
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+
+  // Try currency-marked amounts first.
   
+  const amountPatterns = [
+    /₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+    /(?:rs\.?|inr)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+    /\b([0-9,]+(?:\.[0-9]{1,2})?)\s*(?:rupees|inr|rs\.?)\b/i,
+  ]
 
-const amountPatterns = [
-  /^\s*([\d]{1,3}(?:,\d{3})+(?:\.\d{1,2})?)\s*$/m,
-  /(?:₹|rs\.?|inr)\s*([\d,]+(?:\.\d{1,2})?)/i,
-  /([\d,]+(?:\.\d{1,2})?)\s*(?:₹|rs\.?|inr)\b/i,
-  /(?:paid|sent|received|credited|debited|amount)\s*(?:of\s*)?(?:₹|rs\.?|inr)?\s*([\d,]+(?:\.\d{1,2})?)/i,
-]
+  let amount = ''
 
-
-let amount = ''
-
-for (const pattern of amountPatterns) {
-  const match = text.match(pattern)
-  if (match?.[1]) {
-    amount = match[1].replace(/,/g, '')
-    break
+  for (const pattern of amountPatterns) {
+    const match = normalizedText.match(pattern)
+    if (match?.[1]) {
+      amount = match[1].replace(/,/g, '')
+      break
+    }
   }
-}
 
 
-  const lower = text.toLowerCase()
+  const lower = normalizedText.toLowerCase()
 
   const income =
     /\b(received|credited|cashback received|money received|refund received)\b/.test(lower) &&
@@ -143,35 +148,68 @@ for (const pattern of amountPatterns) {
 
   const type: TransactionType = income ? 'income' : 'expense'
 
-  const lines = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
+  const ignored =
+    /^(paid successfully|payment successful|successful|success|completed|paid|sent|received|debited|credited|google pay|phonepe|gpay|upi|transaction details|payment details|view details|done|close|to|from|paid to|received from|payment to|payment from|amount|total|date|time|bank transfer)$/i
 
-  const ignored = /^(paid successfully|payment successful|successful|success|completed|paid|sent|received|debited|credited|google pay|phonepe|gpay|upi|transaction details|payment details|view details|done|close)$/i
+  const isValidTitle = (value: string) => {
+    const candidate = value
+      .replace(/^(?:to|from|paid to|sent to|received from|payment to|payment from)\s*[:\-]?\s*/i, '')
+      .replace(/^[\s:–—-]+|[\s:–—-]+$/g, '')
+      .trim()
 
-  const titleLine = lines.find((line) => {
-    if (ignored.test(line)) return false
-    if (/^(₹|rs\.?|inr)\s*[\d,]+/i.test(line)) return false
-    if (/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b/.test(line)) return false
-    if (/\b(utr|upi ref|transaction id|reference number|order id)\b/i.test(line)) return false
-    if (/^\d{6,}$/.test(line)) return false
-    if (/^(to|from|paid to|received from)\s*$/i.test(line)) return false
-    return line.length >= 2 && line.length <= 70
-  })
+    if (candidate.length < 2 || candidate.length > 70) return ''
+    if (ignored.test(candidate)) return ''
+    if (/^(?:₹|rs\.?|inr)\s*[\d,]+/i.test(candidate)) return ''
+    if (/^[\d\s,.:/-]+$/.test(candidate)) return ''
+    if (/\b(utr|upi ref|transaction id|reference number|order id)\b/i.test(candidate)) return ''
+    if (/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b/.test(candidate)) return ''
+    if (/^\d{6,}$/.test(candidate)) return ''
 
-  const title = titleLine
-    ?.replace(/^(to|from|paid to|received from)\s*[:\-]?\s*/i, '')
-    .trim() || ''
+    return candidate
+  }
+
+  let title = ''
+
+  // Prefer a name explicitly associated with the payment.
+  for (let i = 0; i < lines.length; i++) {
+    const label = lines[i].match(
+      /^(?:paid to|sent to|received from|payment to|payment from|to|from)\s*[:\-]?\s*(.*)$/i
+    )
+
+    if (!label) continue
+
+    const sameLineTitle = isValidTitle(label[1])
+    if (sameLineTitle) {
+      title = sameLineTitle
+      break
+    }
+
+    // Sometimes OCR places the label and name on separate lines.
+    for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
+      const nextTitle = isValidTitle(lines[j])
+      if (nextTitle) {
+        title = nextTitle
+        break
+      }
+    }
+
+    if (title) break
+  }
+
+  // Fallback: skip the first line, which may be a screen heading or app name.
+  if (!title) {
+    title = lines.slice(1).map(isValidTitle).find(Boolean) || ''
+  }
 
   return {
     amount,
     title,
-    date: parseDate(text),
+    date: parseDate(normalizedText),
     type,
-    category: suggestCategory(`${title} ${text}`),
+    category: suggestCategory(`${title} ${normalizedText}`),
   }
 }
+
 
 export default function AIScan() {
   const [file, setFile] = useState<File | null>(null)
@@ -233,6 +271,7 @@ export default function AIScan() {
       const result = await worker.recognize(file)
       const text = result.data.text.trim()
       setRawText(text)
+      console.log(text)
 
       if (!text) {
         setError('No readable text found. Try a clearer screenshot.')

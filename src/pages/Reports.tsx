@@ -11,6 +11,9 @@ import {
 } from 'recharts'
 import { supabase } from '../supabase'
 import { formatINR } from '../lib/format'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+
 
 type Transaction = {
   id: string
@@ -103,36 +106,76 @@ export default function Reports() {
     ),
   ).sort((a, b) => a.date.localeCompare(b.date))
 
-  function downloadCSV() {
-    const rows = [
-      ['Date', 'Title', 'Type', 'Category', 'Amount (INR)'],
-      
-...transactions.map((transaction) => [
-  transaction.transaction_date
-    ? String(transaction.transaction_date).slice(0, 10)
-    : 'No date',
-  transaction.title,
-  transaction.type,
-  transaction.category,
-  (Number(transaction.amount_paise) / 100).toFixed(2),
-]),
 
-    ]
 
-    const csv = rows
-      .map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(','))
-      .join('\r\n')
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `spendwise-report-${month}.csv`
-    document.body.appendChild(link)
-    link.click()
-    link.remove()
-    URL.revokeObjectURL(url)
-  }
+
+function downloadCSV() {
+  const doc = new jsPDF()
+  const formatPDFMoney = (paise: number) =>
+    `INR ${(Number(paise) / 100).toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`
+
+  doc.setFont('helvetica', 'normal')
+  doc.setCharSpace(0)
+  doc.setFontSize(20)
+  doc.text('SpendWise - Monthly Report', 14, 18)
+
+  doc.setFontSize(11)
+  doc.text(`Month: ${monthLabel}`, 14, 28)
+  doc.text(`Total Income: ${formatPDFMoney(income)}`, 14, 38)
+  doc.text(`Total Expenses: ${formatPDFMoney(expenses)}`, 14, 46)
+  doc.text(`Balance: ${formatPDFMoney(balance)}`, 14, 54)
+
+  autoTable(doc, {
+    startY: 63,
+    margin: { left: 14, right: 14 },
+    head: [['Date', 'Title', 'Type', 'Category', 'Amount']],
+    body: transactions.map((transaction) => [
+      transaction.transaction_date
+        ? String(transaction.transaction_date).slice(0, 10)
+        : 'No date',
+      transaction.title || '',
+      transaction.type,
+      transaction.category || '',
+      formatPDFMoney(Number(transaction.amount_paise)),
+    ]),
+    styles: {
+      font: 'helvetica',
+      fontSize: 8,
+      cellPadding: 2.5,
+      overflow: 'linebreak',
+      valign: 'middle',
+    },
+    columnStyles: {
+      0: { cellWidth: 25 },
+      1: { cellWidth: 48 },
+      2: { cellWidth: 22 },
+      3: { cellWidth: 35 },
+      4: { cellWidth: 52, halign: 'right' },
+    },
+    headStyles: {
+      fillColor: [91, 65, 190],
+      textColor: 255,
+    },
+    didDrawPage: () => {
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(8)
+      doc.text(
+        `Page ${doc.getCurrentPageInfo().pageNumber}`,
+        196,
+        287,
+        { align: 'right' }
+      )
+    },
+  })
+
+  doc.save(`spendwise-report-${month}.pdf`)
+}
+
+
 
   const monthLabel = new Date(`${month}-01T12:00:00`).toLocaleDateString('en-IN', {
     month: 'long',
@@ -156,7 +199,7 @@ export default function Reports() {
             <RefreshCw size={16} /> Refresh
           </button>
           <button onClick={downloadCSV} disabled={loading || transactions.length === 0} className="btn btn-primary">
-            <Download size={16} /> Export CSV
+            <Download size={16} /> Export PDF
           </button>
         </div>
       </div>
