@@ -4,10 +4,10 @@
 
 
 :root {
-  --base: 7 11 26;
-  --card: 16 22 46;
-  --ink: 232 236 248;
-  --mute: 139 150 181;
+  --base: 8 11 20;
+  --card: 17 24 39;
+  --ink: 244 247 251;
+  --mute: 148 163 184;
   --line: 255 255 255;
   --line-a: .09;
 }
@@ -22,14 +22,30 @@
 }
 
 
-body { @apply bg-base text-ink font-sans antialiased; }
+body {
+  @apply bg-base text-ink font-sans antialiased;
+  background-image:
+    radial-gradient(ellipse at 12% 0%, rgb(53 242 161 / .07), transparent 38%),
+    radial-gradient(ellipse at 90% 15%, rgb(66 217 255 / .07), transparent 35%);
+  background-attachment: fixed;
+}
 :focus-visible { outline: 2px solid #22D3EE; outline-offset: 2px; }
-
 .glass {
   background: rgb(var(--card) / .78);
   border: 1px solid rgb(var(--line) / var(--line-a));
-  backdrop-filter: blur(14px);
-  box-shadow: 0 8px 28px rgb(76 55 140 / .04);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    0 8px 32px rgb(0 0 0 / .18),
+    inset 0 1px 0 rgb(255 255 255 / .04);
+  transition: border-color .25s ease, box-shadow .25s ease;
+}
+
+.glass:hover {
+  border-color: rgb(53 242 161 / .22);
+  box-shadow:
+    0 12px 36px rgb(0 0 0 / .22),
+    0 0 24px rgb(53 242 161 / .04);
 }
 
 :root.light .glass {
@@ -39,10 +55,27 @@ body { @apply bg-base text-ink font-sans antialiased; }
 }
 
 .grid-bg { background-image: linear-gradient(rgb(var(--line) / .05) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--line) / .05) 1px, transparent 1px); background-size: 44px 44px; mask-image: radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%); }
-.grad-text { background: linear-gradient(90deg, #8B5CF6, #22D3EE); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition; }
-.btn-primary { background: linear-gradient(135deg, #8B5CF6, #22D3EE); color: #05081a; box-shadow: 0 0 28px -6px #8B5CF6; }
-.btn-primary:hover { filter: brightness(1.1); }
+.grad-text {
+  background: linear-gradient(90deg, #35F2A1, #42D9FF);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition;
+  transition-property: color, background-color, border-color, box-shadow, transform;
+  transition-duration: 200ms;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #35F2A1, #42D9FF);
+  color: #080B14;
+  box-shadow: 0 0 28px -8px #35F2A1;
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 0 32px -6px rgb(53 242 161 / .45);
+  transform: translateY(-1px);
+}
 .btn-ghost { @apply border border-line/10 hover:bg-line/5; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }

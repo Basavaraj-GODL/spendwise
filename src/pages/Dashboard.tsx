@@ -97,34 +97,34 @@ export default function Dashboard() {
   }, [loadDashboard, location.key])
 
   const cards = [
-    {
-      label: 'Balance',
-      value: totals.balance,
-      icon: Wallet,
-      color: 'text-cyan-400',
-      background: 'bg-cyan-400/10',
-    },
-    {
-      label: 'Income',
-      value: totals.income,
-      icon: TrendingUp,
-      color: 'text-emerald-400',
-      background: 'bg-emerald-400/10',
-    },
-    {
-      label: 'Expenses',
-      value: totals.expenses,
-      icon: TrendingDown,
-      color: 'text-violet-400',
-      background: 'bg-violet-400/10',
-    },
-    {
-      label: 'Savings',
-      value: totals.savings,
-      icon: PiggyBank,
-      color: 'text-amber-400',
-      background: 'bg-amber-400/10',
-    },
+   {
+  label: 'Balance',
+  value: totals.balance,
+  icon: Wallet,
+  color: 'text-cyan-300',
+  background: 'bg-cyan-400/10',
+},
+{
+  label: 'Income',
+  value: totals.income,
+  icon: TrendingUp,
+  color: 'text-[#35F2A1]',
+  background: 'bg-[#35F2A1]/10',
+},
+{
+  label: 'Expenses',
+  value: totals.expenses,
+  icon: TrendingDown,
+  color: 'text-rose-400',
+  background: 'bg-rose-400/10',
+},
+{
+  label: 'Savings',
+  value: totals.savings,
+  icon: PiggyBank,
+  color: 'text-[#35F2A1]',
+  background: 'bg-[#35F2A1]/10',
+},
   ]
 
   const recentTransactions = transactions.slice(0, 5)
@@ -133,11 +133,11 @@ export default function Dashboard() {
     <div className="space-y-4 sm:space-y-8">
       <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-cyan-400">
-            YOUR MONEY, YOUR CONTROL
+          <p className="text-xs font-bold tracking-[0.2em] text-[#35F2A1]">
+           YOUR MONEY, YOUR CONTROL
           </p>
-          <h1 className="mt-2 font-display text-2xl font-bold sm:text-3xl">
-            Dashboard
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">
+            Dashboard<span className="text-[#35F2A1]">.</span>
           </h1>
           <p className="mt-2 text-sm leading-6 text-mute">
             Your personal financial overview, all in one place.
@@ -181,7 +181,8 @@ export default function Dashboard() {
         {cards.map(({ label, value, icon: Icon, color, background }, i) => (
           <motion.div
             key={label}
-            className="glass min-w-0 overflow-hidden rounded-2xl p-2.5 sm:p-5"
+            className="glass group min-w-0 overflow-hidden rounded-2xl p-3 sm:p-5"
+whileHover={{ y: -4, scale: 1.01 }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.06 }}
@@ -189,7 +190,10 @@ export default function Dashboard() {
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs text-mute sm:text-sm">{label}</span>
               <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${background}`}>
-                <Icon size={18} className={color} />
+                <Icon
+  size={18}
+  className={`${color} transition-transform duration-300 group-hover:scale-110`}
+/>
               </span>
             </div>
 
@@ -236,7 +240,7 @@ export default function Dashboard() {
             {recentTransactions.map(item => (
               <div
                 key={item.id}
-                className="flex items-center gap-3 rounded-xl border border-line/10 p-3"
+                className="group flex items-center gap-3 rounded-xl border border-line/10 bg-white/[0.02] p-3 transition-all duration-300 hover:border-[#35F2A1]/20 hover:bg-[#35F2A1]/[0.03]"
               >
                 <div className={`grid size-10 shrink-0 place-items-center rounded-xl ${
                   item.type === 'income'
@@ -251,14 +255,13 @@ export default function Dashboard() {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium">
-                    {item.category}
-                  </p>
-                  <p className="text-xs text-mute">
-                    {item.transaction_date}
-                  </p>
-                </div>
-
+  <p className="font-medium transition-colors group-hover:text-[#35F2A1]">
+    {item.category}
+  </p>
+  <p className="text-xs text-mute">
+    {item.transaction_date}
+  </p>
+</div>
                 <p className={`whitespace-nowrap text-sm font-semibold ${
                   item.type === 'income'
                     ? 'text-emerald-400'
