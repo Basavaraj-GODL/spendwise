@@ -2,85 +2,242 @@
 @tailwind components;
 @tailwind utilities;
 
-
-:root {
-  --base: 8 11 20;
-  --card: 17 24 39;
-  --ink: 244 247 251;
-  --mute: 148 163 184;
-  --line: 255 255 255;
-  --line-a: .09;
-}
-
+/* ==========================================================================
+   SpendWise – white & orange fintech theme
+   Single light theme. `.light` and `.dark` on <html> both resolve to the
+   same values, so an old theme toggle can't bring the dark palette back.
+   Colour variables stay as space-separated RGB triplets so Tailwind classes
+   such as bg-base, text-ink, border-line/10 keep working with alpha.
+   ========================================================================== */
+/* DEFAULT THEME: LIGHT */
+:root,
 :root.light {
-  --base: 246 245 255;
+  color-scheme: light;
+
+  --base: 247 247 245;
   --card: 255 255 255;
-  --ink: 31 35 68;
-  --mute: 105 110 145;
-  --line: 111 91 170;
-  --line-a: .13;
+  --ink: 23 23 23;
+  --mute: 115 115 115;
+  --line: 23 23 23;
+  --line-a: .09;
+
+  --accent: 249 115 22;
+  --accent-2: 255 138 61;
+  --accent-strong: 234 88 12;
+  --accent-ink: 194 65 12;
+  --income: 22 163 74;
+  --expense: 249 115 22;
+  --border: 234 234 234;
+
+  --shadow-card: 0 1px 2px rgb(23 23 23 / .04), 0 8px 24px -12px rgb(23 23 23 / .10);
+  --shadow-card-hover: 0 2px 4px rgb(23 23 23 / .05), 0 18px 36px -16px rgb(249 115 22 / .28);
+  --ease: cubic-bezier(.22, .61, .36, 1);
 }
 
+/* DARK THEME */
+:root.dark {
+  color-scheme: dark;
+
+  --base: 15 17 23;
+  --card: 24 27 35;
+  --ink: 243 244 246;
+  --mute: 156 163 175;
+  --line: 255 255 255;
+  --line-a: .10;
+
+  --accent: 251 146 60;
+  --accent-2: 255 169 92;
+  --accent-strong: 249 115 22;
+  --accent-ink: 253 186 116;
+  --income: 74 222 128;
+  --expense: 251 146 60;
+  --border: 55 60 72;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / .18), 0 8px 24px -12px rgb(0 0 0 / .35);
+  --shadow-card-hover: 0 2px 4px rgb(0 0 0 / .2), 0 18px 36px -16px rgb(249 115 22 / .18);
+  --ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+html.dark {
+  color-scheme: dark;
+}
 
 body {
   @apply bg-base text-ink font-sans antialiased;
   background-image:
-    radial-gradient(ellipse at 12% 0%, rgb(53 242 161 / .07), transparent 38%),
-    radial-gradient(ellipse at 90% 15%, rgb(66 217 255 / .07), transparent 35%);
+    radial-gradient(ellipse at 10% 0%, rgb(var(--accent) / .05), transparent 40%),
+    radial-gradient(ellipse at 95% 12%, rgb(253 186 116 / .08), transparent 36%);
   background-attachment: fixed;
 }
-:focus-visible { outline: 2px solid #22D3EE; outline-offset: 2px; }
+
+/* Slow, subtle ambient orange drift behind the app */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 38% at 8% -4%, rgb(var(--accent) / .09), transparent 62%),
+    radial-gradient(ellipse 45% 35% at 96% 8%, rgb(253 186 116 / .12), transparent 62%);
+  animation: ambient-drift 24s ease-in-out infinite alternate;
+}
+
+::selection {
+  background: rgb(var(--accent) / .22);
+  color: rgb(var(--ink));
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Cards / panels  (was glassmorphism)
+   -------------------------------------------------------------------------- */
 .glass {
-  background: rgb(var(--card) / .78);
+  background: rgb(var(--card));
   border: 1px solid rgb(var(--line) / var(--line-a));
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow:
-    0 8px 32px rgb(0 0 0 / .18),
-    inset 0 1px 0 rgb(255 255 255 / .04);
-  transition: border-color .25s ease, box-shadow .25s ease;
+  box-shadow: var(--shadow-card);
+  transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
 }
 
 .glass:hover {
-  border-color: rgb(53 242 161 / .22);
-  box-shadow:
-    0 12px 36px rgb(0 0 0 / .22),
-    0 0 24px rgb(53 242 161 / .04);
+  border-color: rgb(var(--accent) / .35);
+  box-shadow: var(--shadow-card-hover);
 }
 
 :root.light .glass {
-  background: linear-gradient(145deg, #ffffff, #faf8ff);
-  border-color: rgb(139 92 246 / .16);
-  box-shadow: 0 8px 28px rgb(76 55 140 / .07);
+  background: rgb(var(--card));
+  border-color: rgb(var(--line) / var(--line-a));
+  box-shadow: var(--shadow-card);
 }
 
-.grid-bg { background-image: linear-gradient(rgb(var(--line) / .05) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--line) / .05) 1px, transparent 1px); background-size: 44px 44px; mask-image: radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%); }
+.grid-bg {
+  background-image:
+    linear-gradient(rgb(var(--line) / .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--line) / .05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%);
+}
+
 .grad-text {
-  background: linear-gradient(90deg, #35F2A1, #42D9FF);
+  background: linear-gradient(90deg, #EA580C, #F97316, #FF8A3D, #F97316, #EA580C);
+  background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-}
-.btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition;
-  transition-property: color, background-color, border-color, box-shadow, transform;
-  transition-duration: 200ms;
-}
-.btn-primary {
-  background: linear-gradient(135deg, #35F2A1, #42D9FF);
-  color: #080B14;
-  box-shadow: 0 0 28px -8px #35F2A1;
-}
-.btn-primary:hover {
-  filter: brightness(1.08);
-  box-shadow: 0 0 32px -6px rgb(53 242 161 / .45);
-  transform: translateY(-1px);
-}
-.btn-ghost { @apply border border-line/10 hover:bg-line/5; }
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  animation: grad-shift 8s linear infinite;
 }
 
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+.btn-primary {
+  background: linear-gradient(135deg, #F97316, #FF8A3D 55%, #F97316);
+  background-size: 200% 200%;
+  background-position: 0% 50%;
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 6px 16px -6px rgb(var(--accent) / .55);
+  transition:
+    background-position .5s var(--ease),
+    box-shadow .25s var(--ease),
+    transform .2s var(--ease),
+    filter .2s var(--ease);
+  padding: 12px 18px;
+  border-radius: 10px;
+}
+
+.btn-primary:hover {
+  background-position: 100% 50%;
+  filter: none;
+  box-shadow: 0 10px 22px -8px rgb(var(--accent) / .6);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px -6px rgb(var(--accent) / .6);
+}
+
+.btn-primary:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-ghost {
+  padding: 12px 18px;
+  border-radius: 10px;
+  @apply border border-line/10 hover:bg-line/5;
+  transition: background-color .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease);
+}
+
+.btn-ghost:hover {
+  border-color: rgb(var(--accent) / .45);
+  color: rgb(var(--accent-ink));
+}
+
+/* --------------------------------------------------------------------------
+   Opt-in helpers (new, unused until you add the class to an element)
+   -------------------------------------------------------------------------- */
+.text-income { color: rgb(var(--income)); }
+.text-expense { color: rgb(var(--expense)); }
+
+/* Staggered entrance: <div class="anim-rise" style={{ "--i": 0 }}> */
+.anim-rise {
+  opacity: 0;
+  animation: rise-in .55s var(--ease) forwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+.hover-lift {
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* --------------------------------------------------------------------------
+   Keyframes
+   -------------------------------------------------------------------------- */
+@keyframes ambient-drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(1.5%, 2%, 0) scale(1.06); }
+}
+
+@keyframes grad-shift {
+  from { background-position: 0% 50%; }
+  to   { background-position: 200% 50%; }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .anim-rise { opacity: 1; }
+}
+
+/* --------------------------------------------------------------------------
+   Signup page
+   -------------------------------------------------------------------------- */
 .signup-page {
   min-height: 100vh;
   position: relative;
@@ -102,21 +259,22 @@ body {
   height: 420px;
   border-radius: 50%;
   filter: blur(110px);
-  opacity: .3;
+  opacity: .22;
   pointer-events: none;
   z-index: -1;
 }
 
 .signup-glow-one {
-  background: #8B5CF6;
+  background: #ff8400;
   top: 100px;
   left: -230px;
 }
 
 .signup-glow-two {
-  background: #22D3EE;
+  background: #f96800;
   right: -180px;
   bottom: -100px;
+  opacity: .16;
 }
 
 .signup-brand {
@@ -131,7 +289,7 @@ body {
 }
 
 .signup-brand > span:last-child {
-  background: linear-gradient(90deg, #8B5CF6, #22D3EE);
+  background: linear-gradient(90deg, #EA580C, #F97316);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -144,8 +302,8 @@ body {
   height: 36px;
   border-radius: 11px;
   color: white;
-  background: linear-gradient(135deg, #8B5CF6, #22D3EE);
-  box-shadow: 0 0 24px #8B5CF655;
+  background: linear-gradient(135deg, #F97316, #FF8A3D);
+  box-shadow: 0 6px 16px -6px rgb(var(--accent) / .55);
   font-size: 21px;
 }
 
@@ -176,9 +334,9 @@ body {
 .eyebrow > span {
   width: 8px;
   height: 8px;
-  background: #22D3EE;
+  background: #F97316;
   border-radius: 50%;
-  box-shadow: 0 0 15px #22D3EE88;
+  box-shadow: 0 0 0 4px rgb(var(--accent) / .16);
 }
 
 .signup-intro h1 {
@@ -191,7 +349,7 @@ body {
 }
 
 .signup-intro h1 span {
-  background: linear-gradient(90deg, #8B5CF6, #22D3EE);
+  background: linear-gradient(90deg, #EA580C, #F97316, #FF8A3D);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -222,11 +380,17 @@ body {
   height: 44px;
   display: grid;
   place-items: center;
-  border: 1px solid #8B5CF655;
+  border: 1px solid rgb(var(--accent) / .25);
   border-radius: 14px;
-  color: #22D3EE;
-  background: #8B5CF615;
+  color: rgb(var(--accent-strong));
+  background: rgb(var(--accent) / .09);
   font-size: 21px;
+  transition: background-color .25s var(--ease), transform .25s var(--ease);
+}
+
+.feature-item:hover .feature-icon {
+  background: rgb(var(--accent) / .16);
+  transform: translateY(-1px);
 }
 
 .feature-item strong {
@@ -244,28 +408,23 @@ body {
 .intro-footer {
   margin-top: 45px;
   padding-top: 20px;
-  border-top: 1px solid rgb(var(--line) / .1);
+  border-top: 1px solid rgb(var(--line) / var(--line-a));
   color: rgb(var(--mute));
   font-size: 12px;
 }
 
 .signup-card {
   padding: 35px;
-  border: 1px solid #8B5CF633;
+  border: 1px solid rgb(var(--line) / var(--line-a));
   border-radius: 24px;
-  background: linear-gradient(
-    145deg,
-    rgb(var(--card) / .94),
-    rgb(var(--base) / .94)
-  );
-  backdrop-filter: blur(18px);
-  box-shadow: 0 25px 80px #00000030, 0 0 50px -30px #8B5CF6;
+ background: rgb(var(--card));
+box-shadow: var(--shadow-card);
 }
 
 .card-topline {
   display: flex;
   justify-content: space-between;
-  color: #A78BFA;
+  color: rgb(var(--accent-ink));
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1.6px;
@@ -304,23 +463,27 @@ body {
   min-width: 0;
   margin: 0 0 19px;
   padding: 14px 15px;
-  border: 1px solid rgb(var(--line) / .12);
+  border: 1px solid rgb(var(--border));
   border-radius: 10px;
   outline: none;
-  background: rgb(var(--base) / .8);
+  background: rgb(var(--base));
   color: rgb(var(--ink));
   font: inherit;
   font-size: 13px;
-  transition: border-color .2s, box-shadow .2s;
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
 }
 
 .signup-card input::placeholder {
   color: rgb(var(--mute));
 }
 
+.signup-card input:hover {
+  border-color: rgb(var(--accent) / .45);
+}
+
 .signup-card input:focus {
-  border-color: #8B5CF6;
-  box-shadow: 0 0 0 3px #8B5CF622;
+  border-color: #F97316;
+  box-shadow: 0 0 0 3px rgb(var(--accent) / .18);
 }
 
 .signup-card button {
@@ -329,28 +492,35 @@ body {
   padding: 15px;
   border: 0;
   border-radius: 11px;
-  background: linear-gradient(135deg, #8B5CF6, #22D3EE);
-  color: #070B1A;
+  background: linear-gradient(135deg, #F97316, #FF8A3D 55%, #F97316);
+  background-size: 200% 200%;
+  background-position: 0% 50%;
+  color: #FFFFFF;
   font-size: 14px;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 0 28px -8px #8B5CF6;
-  transition: transform .2s, filter .2s;
+  box-shadow: 0 6px 16px -6px rgb(var(--accent) / .55);
+  transition:
+    transform .2s var(--ease),
+    box-shadow .25s var(--ease),
+    background-position .5s var(--ease);
 }
 
 .signup-card button:hover {
-  filter: brightness(1.1);
+  background-position: 100% 50%;
+  box-shadow: 0 10px 22px -8px rgb(var(--accent) / .6);
   transform: translateY(-1px);
 }
 
 .signup-card button:disabled {
   opacity: .65;
   cursor: wait;
+  transform: none;
 }
 
 .signup-message {
   margin: 16px 0 0;
-  color: #22D3EE;
+  color: rgb(var(--accent-ink));
   font-size: 13px;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -364,7 +534,7 @@ body {
 }
 
 .login-prompt a {
-  color: #22D3EE;
+  color: rgb(var(--accent-ink));
   font-weight: 700;
   text-decoration: none;
 }
@@ -415,13 +585,199 @@ body {
     padding: 23px 19px;
   }
 }
-.dark p {
-  color: #ffffff;
+
+/* --------------------------------------------------------------------------
+   Dashboard amounts
+   The old rules forced white (dark) / navy (light). Dark is gone, so this is
+   now always ink. Kept !important so hard-coded Tailwind text-white classes
+   on these elements can't make them invisible on white cards.
+   -------------------------------------------------------------------------- */
+.dashboard-amount {
+  color: rgb(var(--ink)) !important;
+  font-variant-numeric: tabular-nums;
 }
-html.light .dashboard-amount {
-  color: #1f2344 !important;
+/* --------------------------------------------------------------------------
+   Circular theme reveal (View Transitions API)
+   Driven by ThemeToggle.tsx, which sets --theme-cx/cy/r and data-theme-anim
+   -------------------------------------------------------------------------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
-html:not(.light) .dashboard-amount {
-  color: #ffffff !important;
+html[data-theme-anim="1"]::view-transition-old(root) {
+  z-index: 1;
+}
+
+html[data-theme-anim="1"]::view-transition-new(root) {
+  z-index: 2;
+  animation: theme-reveal .65s var(--ease) both;
+}
+
+@keyframes theme-reveal {
+  from { clip-path: circle(0px at var(--theme-cx) var(--theme-cy)); }
+  to   { clip-path: circle(var(--theme-r) at var(--theme-cx) var(--theme-cy)); }
+}
+
+.loader {
+  position: relative;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader span {
+  position: absolute;
+  color: #fff;
+  transform: translate(-50%, -50%);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.loader span:nth-child(1) {
+  color: transparent;
+  -webkit-text-stroke: 0.6px #FF7A1A;
+}
+
+.loader span:nth-child(2) {
+  color: #FF7A1A;
+  -webkit-text-stroke: 1px #FF7A1A;
+  animation: spendWiseWave 3s ease-in-out infinite;
+}
+
+@keyframes spendWiseWave {
+  0%, 100% {
+    clip-path: polygon(
+      0% 45%, 15% 44%, 32% 50%,
+      54% 60%, 70% 61%, 84% 59%,
+      100% 52%, 100% 100%, 0% 100%
+    );
+  }
+
+  50% {
+    clip-path: polygon(
+      0% 60%, 16% 65%, 34% 66%,
+      51% 62%, 67% 50%, 84% 45%,
+      100% 46%, 100% 100%, 0% 100%
+    );
+  }
+}
+
+/* SpendWise animated PDF download button */
+.install-btn {
+  position: relative;
+  display: inline-flex;
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  background: #18181b;
+  cursor: pointer;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.install-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.4),
+    0 0 16px rgba(255, 122, 26, 0.2);
+}
+
+.install-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.install-btn:focus-visible {
+  outline: 2px solid #FF7A1A;
+  outline-offset: 4px;
+}
+
+.install-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.install-btn__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transform: rotate(-90deg);
+}
+
+.install-btn__mask-circle {
+  fill: none;
+  stroke: white;
+  stroke-width: 5px;
+}
+
+.install-btn__track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 5px;
+}
+
+.install-btn__fill {
+  fill: none;
+  stroke: #FF7A1A;
+  stroke-width: 5px;
+  stroke-dasharray: 264;
+  stroke-dashoffset: 264;
+}
+
+.install-btn__icon {
+  z-index: 1;
+  width: 23px;
+  height: 23px;
+  color: #f4f4f5;
+  pointer-events: none;
+}
+
+.install-btn:focus .install-btn__fill {
+  animation: install-btn-progress 4.2s ease forwards;
+}
+
+.install-btn:focus .install-btn__icon {
+  color: #FF7A1A;
+  animation: install-btn-bounce 0.6s ease;
+}
+
+@keyframes install-btn-progress {
+  0% { stroke-dashoffset: 264; }
+  14% { stroke-dashoffset: 211.2; }
+  22% { stroke-dashoffset: 211.2; }
+  48% { stroke-dashoffset: 158.4; }
+  56% { stroke-dashoffset: 105.6; }
+  68% { stroke-dashoffset: 105.6; }
+  84% { stroke-dashoffset: 52.8; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes install-btn-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .install-btn,
+  .install-btn__icon {
+    animation: none !important;
+    transition: none;
+  }
+
+  .install-btn:focus .install-btn__fill {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
 }

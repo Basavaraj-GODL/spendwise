@@ -4,7 +4,9 @@ import { motion } from 'framer-motion'
 import { Plus, Trash2, ArrowLeftRight } from 'lucide-react'
 import { supabase } from '../supabase'
 import { formatINR } from '../lib/format'
-
+import LoadingAnimation from '../components/Loader.tsx'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 type Transaction = {
   id: string
   user_id: string
@@ -127,18 +129,150 @@ export default function Transactions() {
     )
     setMessage('Transaction deleted.')
   }
+  function downloadTransactionsPDF() {
+    if (transactions.length === 0) {
+      setMessage('No transactions available to export.')
+      return
+    }
 
+    const doc = new jsPDF()
+
+    const formatPDFMoney = (paise: number) =>
+      `INR ${(Number(paise) / 100).toLocaleString('en-IN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`
+
+    const income = transactions
+      .filter(transaction => transaction.type === 'income')
+      .reduce((sum, transaction) => sum + Number(transaction.amount_paise), 0)
+
+    const expenses = transactions
+      .filter(transaction => transaction.type === 'expense')
+      .reduce((sum, transaction) => sum + Number(transaction.amount_paise), 0)
+
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(20)
+    doc.text('SpendWise - Transactions Report', 14, 20)
+
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(11)
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}`, 14, 30)
+    doc.text(`Total Income: ${formatPDFMoney(income)}`, 14, 40)
+    doc.text(`Total Expenses: ${formatPDFMoney(expenses)}`, 14, 48)
+    doc.text(`Net Balance: ${formatPDFMoney(income - expenses)}`, 14, 56)
+    doc.text(`Total Transactions: ${transactions.length}`, 14, 64)
+
+    autoTable(doc, {
+      startY: 72,
+      margin: { left: 14, right: 14 },
+      head: [['Date', 'Title', 'Type', 'Category', 'Amount']],
+      body: transactions.map(transaction => [
+        transaction.transaction_date || 'No date',
+        transaction.title || '',
+        transaction.type,
+        transaction.category || 'Other',
+        formatPDFMoney(Number(transaction.amount_paise)),
+      ]),
+      styles: {
+        font: 'helvetica',
+        fontSize: 8,
+        cellPadding: 2.5,
+        overflow: 'linebreak',
+        valign: 'middle',
+      },
+      columnStyles: {
+        0: { cellWidth: 27 },
+        1: { cellWidth: 48 },
+        2: { cellWidth: 23 },
+        3: { cellWidth: 35 },
+        4: { cellWidth: 45, halign: 'right' },
+      },
+      headStyles: {
+        fillColor: [91, 65, 190],
+        textColor: 255,
+      },
+      didDrawPage: () => {
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(8)
+        doc.text(
+          `Page ${doc.getCurrentPageInfo().pageNumber}`,
+          196,
+          287,
+          { align: 'right' }
+        )
+      },
+    })
+
+    doc.save(`spendwise-transactions-${new Date().toISOString().slice(0, 10)}.pdf`)
+  }
   return (
     <div className="w-full min-w-0 space-y-4 sm:space-y-6">
-      <div>
+      <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="break-words font-display text-xl font-semibold sm:text-2xl">
-             Transactions
-          </h1>
-        <p className="mt-1 text-sm text-mute sm:text-base">
-          Track every rupee coming in and going out.
-        </p>
-      </div>
+          Transactions
+        </h1>
+        <button
+          type="button"
+          className="install-btn"
+          aria-label="Download transactions report as PDF"
+          title="Download transactions report as PDF"
+          onClick={downloadTransactionsPDF}
+          disabled={loading || transactions.length === 0}
+        >
+          <svg
+            className="install-btn__svg"
+            viewBox="0 0 100 100"
+            aria-hidden="true"
+          >
+            <defs>
+              <mask id="install-mask">
+                <circle
+                  className="install-btn__mask-circle"
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  strokeDasharray="39.2 13.6"
+                  strokeLinecap="round"
+                />
+              </mask>
+            </defs>
 
+            <circle
+              className="install-btn__track"
+              cx="50"
+              cy="50"
+              r="42"
+              strokeDasharray="39.2 13.6"
+              strokeLinecap="round"
+            />
+
+            <circle
+              className="install-btn__fill"
+              cx="50"
+              cy="50"
+              r="42"
+              mask="url(#install-mask)"
+            />
+          </svg>
+
+          <svg
+            className="install-btn__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </button>
+
+      </div>
       <div className="grid grid-cols-1 items-start gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
         <motion.section
           className="glass min-w-0 rounded-2xl p-4 sm:p-6"
@@ -267,9 +401,9 @@ export default function Transactions() {
           </h2>
 
           {loading ? (
-            <p className="py-8 text-center text-sm text-mute">
-              Loading transactions...
-            </p>
+            <div className=" flex min-h-[60vh] items-center justify-center">
+              <LoadingAnimation />
+            </div>
           ) : transactions.length === 0 ? (
             <div className="grid place-items-center py-12 text-center">
               <ArrowLeftRight size={28} className="mb-3 text-mute" />
@@ -299,11 +433,10 @@ export default function Transactions() {
                   </div>
 
                   <div className="min-w-0 shrink-0 text-right">
-                    <p className={`whitespace-nowrap text-sm font-semibold ${
-                      transaction.type === 'income' ? 'text-emerald' : 'text-violet'
-                    }`}>
+                    <p className={`whitespace-nowrap text-sm font-semibold ${transaction.type === 'income' ? 'text-emerald' : 'text-violet'
+                      }`}>
                       {transaction.type === 'income' ? '+' : '−'}
-                      {formatINR(transaction.amount_paise )}
+                      {formatINR(transaction.amount_paise)}
                     </p>
                     <button
                       type="button"
@@ -320,6 +453,6 @@ export default function Transactions() {
           )}
         </section>
       </div>
-    </div>
+    </div >
   )
 }

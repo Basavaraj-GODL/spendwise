@@ -14,6 +14,7 @@ import {
   YAxis,
   CartesianGrid,
 } from 'recharts'
+import LoadingAnimation from '../components/Loader.tsx'
 import { TrendingDown, Wallet, RefreshCw, ChartNoAxesCombined } from 'lucide-react'
 import { supabase } from '../supabase'
 import { formatINR } from '../lib/format'
@@ -132,8 +133,8 @@ export default function Analytics() {
             YOUR MONEY, YOUR CONTROL
           </p>
           <h1 className="mt-2 text-2xl font-semibold text-ink sm:text-3xl">
-  Spending Analytics
-</h1>
+            Spending Analytics
+          </h1>
           <p className="mt-2 text-sm text-mute">
             Understand your spending patterns at a glance.
           </p>
@@ -151,8 +152,8 @@ export default function Analytics() {
       )}
 
       {loading ? (
-        <div className="glass rounded-2xl p-8 text-center text-mute">
-          Loading your analytics...
+        <div className="fixed inset-0 z-50 flex min-h-[60vh] items-center justify-center bg-base">
+          <LoadingAnimation />
         </div>
       ) : (
         <>

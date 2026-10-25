@@ -1,19 +1,16 @@
-
 import { useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard,
   ArrowLeftRight,
   ChartNoAxesCombined,
   ScanLine,
-  PiggyBank,
-  Target,
-  Repeat,
-  FileBarChart,
   Settings,
   Menu,
   X,
+  ChevronRight,
+  Sparkles,
 } from 'lucide-react'
 import Logo from '../components/Logo'
 import ThemeToggle from '../components/ThemeToggle'
@@ -22,37 +19,61 @@ const nav = [
   { to: '/app', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/app/transactions', label: 'Transactions', icon: ArrowLeftRight },
   { to: '/app/analytics', label: 'Analytics', icon: ChartNoAxesCombined },
-  { to: '/app/ai-scan', label: 'AI Scan', icon: ScanLine },
-  { to: '/app/budgets', label: 'Budgets', icon: PiggyBank },
-  { to: '/app/goals', label: 'Savings goals', icon: Target },
-  { to: '/app/recurring', label: 'Recurring', icon: Repeat },
-  { to: '/app/reports', label: 'Reports', icon: FileBarChart },
+  { to: '/app/ai-scan', label: 'AI Scan', icon: ScanLine, featured: true },
   { to: '/app/settings', label: 'Settings', icon: Settings },
 ]
 
 function NavList({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <nav aria-label="Main" className="flex flex-col gap-1">
-      {nav.map(({ to, label, icon: Icon, end }) => (
+    <nav aria-label="Main navigation" className="flex flex-col gap-1.5">
+      <p className="mb-2 mt-2 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-mute">
+        Workspace
+      </p>
+
+      {nav.map(({ to, label, icon: Icon, end, featured }) => (
         <NavLink
           key={to}
           to={to}
           end={end}
           onClick={onNavigate}
           className={({ isActive }) =>
-            `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
-              isActive
-                ? 'bg-violet/15 text-ink shadow-[inset_2px_0_0_#22D3EE]'
-                : 'text-mute hover:bg-line/5 hover:text-ink'
+            `group relative flex items-center gap-3 overflow-hidden rounded-full px-3.5 py-3 text-[13px] font-medium transition-all duration-200 ${isActive
+              ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
+              : 'text-mute hover:bg-black/[0.035] hover:text-ink dark:hover:bg-white/[0.06]'
             }`
           }
         >
-          <Icon size={18} />
-          {label}
-          {label === 'AI Scan' && (
-            <span className="ml-auto rounded-full bg-cyan-400/10 px-2 py-0.5 text-[10px] font-semibold text-cyan-400">
-              NEW
-            </span>
+          {({ isActive }) => (
+            <>
+              <motion.span
+                layoutId="spendwise-active-nav"
+                className="absolute inset-0 z-0 rounded-full border border-orange-500/20 bg-orange-500/[0.08]"
+                transition={{
+                  type: 'spring',
+                  stiffness: 380,
+                  damping: 32,
+                }}
+                aria-hidden="true"
+              />
+
+              <Icon
+                size={18}
+                strokeWidth={isActive ? 2.2 : 1.8}
+                className={`shrink-0 transition-colors ${isActive ? 'text-orange-500' : 'text-mute group-hover:text-orange-500'
+                  }`}
+              />
+
+              <span className="flex-1">{label}</span>
+
+              {featured && (
+                <span className="inline-flex items-center gap-1 rounded-md bg-orange-500/10 px-1.5 py-1 text-[9px] font-bold tracking-wide text-orange-600 dark:text-orange-400">
+                  <Sparkles size={10} />
+                  AI
+                </span>
+              )}
+
+              {isActive && <ChevronRight size={14} className="text-orange-500" />}
+            </>
           )}
         </NavLink>
       ))}
@@ -62,75 +83,120 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
 
 export default function AppShell() {
   const [open, setOpen] = useState(false)
+  const location = useLocation()
+
+  const currentPage =
+    nav.find(item =>
+      item.end
+        ? location.pathname === item.to
+        : location.pathname.startsWith(item.to)
+    )?.label ?? 'SpendWise'
 
   return (
-    <div className="min-h-screen w-full min-w-0 lg:grid lg:grid-cols-[250px_minmax(0,1fr)]">
-      <aside className="glass hidden border-y-0 border-l-0 p-5 lg:block">
-        <div className="mb-8">
+    <div className="min-h-screen w-full min-w-0 bg-base text-ink lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
+      {/* Desktop sidebar */}
+      <aside className="sticky top-0 hidden h-screen border-r border-line/[var(--line-a)] bg-card/80 p-5 lg:flex lg:flex-col">
+        <div className="mb-9 px-2 pt-1">
           <Logo />
         </div>
+
         <NavList />
+
+        
       </aside>
 
-      <div>
-        
-<header className="glass sticky top-0 z-20 flex min-w-0 items-center justify-between border-x-0 border-t-0 px-4 py-3 sm:px-6">
-  <div className="flex items-center gap-3">
-    <button
-      className="btn btn-ghost !px-3 lg:hidden"
-      onClick={() => setOpen(true)}
-      aria-label="Open menu"
-    >
-      <Menu size={18} />
-    </button>
+      {/* Main content */}
+      <div className="min-w-0">
+        <header className="sticky top-0 z-20 flex min-h-[68px] min-w-0 items-center justify-between border-b border-line/[var(--line-a)] bg-base/90 px-4 backdrop-blur-xl sm:px-7 lg:px-9">
+          <div className="flex min-w-0 items-center gap-3">
+            <button
+              type="button"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line/[var(--line-a)] bg-card text-ink shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-500/40 hover:text-orange-500 hover:shadow-md active:scale-95 lg:hidden"
+              onClick={() => setOpen(true)}
+              aria-label="Open navigation menu"
+            >
+              <Menu size={19} />
+            </button>
 
-    <div className="lg:hidden">
-      <Logo />
-    </div>
+            <div className="lg:hidden">
+              <Logo />
+            </div>
 
-    <span className="hidden text-sm text-mute lg:block">
-      Your personal finance dashboard
-    </span>
-  </div>
+            <div className="hidden min-w-0 lg:block">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-mute">
+                Your workspace
+              </p>
+              <h1 className="mt-0.5 truncate text-lg font-semibold tracking-tight text-ink">
+                {currentPage}
+              </h1>
+            </div>
+          </div>
 
-  <ThemeToggle />
-</header>
+          <div className="flex items-center gap-3">
+            <span className="hidden rounded-full border border-line/[var(--line-a)] bg-card px-3 py-1.5 text-[11px] font-medium text-mute sm:inline-flex">
+              Personal finance
+            </span>
+            <ThemeToggle />
+          </div>
+        </header>
 
-
-        <main className="mx-auto w-full min-w-0 max-w-6xl px-3 py-4 sm:p-8">
-          <Outlet />
+        <main className="mx-auto w-full min-w-0 max-w-[1600px] px-4 py-6 sm:px-7 sm:py-8 lg:px-9 lg:py-9">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -6, filter: 'blur(2px)' }}
+              transition={{
+                duration: 0.28,
+                ease: [0.22, 0.61, 0.36, 1],
+              }}
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
 
+      {/* Mobile navigation */}
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-30 bg-black/60 lg:hidden"
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[3px] lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setOpen(false)}
           >
-            <motion.div
-              className="glass h-full w-72 bg-base p-5"
-              initial={{ x: -288 }}
+            <motion.aside
+              className="flex h-full w-[min(310px,86vw)] flex-col border-r border-line/[var(--line-a)] bg-card p-5 shadow-2xl"
+              initial={{ x: -320 }}
               animate={{ x: 0 }}
-              exit={{ x: -288 }}
-              onClick={(e) => e.stopPropagation()}
+              exit={{ x: -320 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              onClick={event => event.stopPropagation()}
               role="dialog"
-              aria-label="Menu"
+              aria-modal="true"
+              aria-label="Navigation menu"
             >
               <div className="mb-8 flex items-center justify-between">
                 <Logo />
                 <button
+                  type="button"
+                  className="grid h-10 w-10 place-items-center rounded-full border border-line/[var(--line-a)] bg-card text-mute shadow-sm transition-all duration-300 hover:border-orange-500/40 hover:bg-orange-500/10 hover:text-orange-500 active:scale-95"
                   onClick={() => setOpen(false)}
-                  aria-label="Close menu"
+                  aria-label="Close navigation menu"
                 >
                   <X size={18} />
                 </button>
               </div>
+
               <NavList onNavigate={() => setOpen(false)} />
-            </motion.div>
+
+              <div className="mt-auto border-t border-line/[var(--line-a)] pt-4">
+                <p className="text-xs text-mute">SpendWise · Personal Finance</p>
+              </div>
+            </motion.aside>
           </motion.div>
         )}
       </AnimatePresence>

@@ -105,11 +105,6 @@ export default function Reports() {
       {},
     ),
   ).sort((a, b) => a.date.localeCompare(b.date))
-
-
-
-
-
 function downloadCSV() {
   const doc = new jsPDF()
   const formatPDFMoney = (paise: number) =>
@@ -174,9 +169,7 @@ function downloadCSV() {
 
   doc.save(`spendwise-report-${month}.pdf`)
 }
-
-
-
+downloadCSV
   const monthLabel = new Date(`${month}-01T12:00:00`).toLocaleDateString('en-IN', {
     month: 'long',
     year: 'numeric',

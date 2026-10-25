@@ -8,9 +8,6 @@ import Login from './pages/login'
 import Transactions from './pages/Transactions'
 import AIScan from './pages/AIScan'
 import Analytics from './pages/Analytics'
-import Budgets from './pages/Budgets'
-import SavingsGoals from './pages/SavingsGoals'
-import RecurringPayments from './pages/RecurringPayments'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import AdminDashboard from './pages/AdminDashboard'
@@ -26,9 +23,6 @@ export default function App() {
         <Route path="transactions" element={<Transactions />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="ai-scan" element={<AIScan />} />
-        <Route path="budgets" element={<Budgets />} />
-        <Route path="goals" element={<SavingsGoals />} />
-        <Route path="recurring" element={<RecurringPayments />} />
         <Route path="reports" element={<Reports />} />
         <Route path="settings" element={<Settings />} />
         <Route path="admin" element={<AdminDashboard />} />

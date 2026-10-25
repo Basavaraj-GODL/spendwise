@@ -1,4 +1,4 @@
-# SpendWise (Stage 1)
+# SpendWise
 
 ## Run on Windows (VS Code terminal)
 1. Install Node.js 20 LTS from nodejs.org.
