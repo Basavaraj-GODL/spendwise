@@ -138,8 +138,8 @@ import { formatINR } from '../lib/format'
 
 // Illustrative sample only (paise). Labelled as sample in the UI. Real data starts in Stage 4.
 const sample = [
-  { m: 'May', v: 4200000 }, { m: 'Jun', v: 3850000 }, { m: 'Jul', v: 4600000 },
-  { m: 'Aug', v: 3900000 }, { m: 'Sep', v: 4400000 }, { m: 'Oct', v: 3600000 },
+  { m: 'Jan', v: 4200000 }, { m: 'Feb', v: 3850000 }, { m: 'Mar', v: 4600000 },
+  { m: 'Apr', v: 3900000 }, { m: 'May', v: 4400000 }, { m: 'Jun', v: 3600000 },
 ]
 const features = [
   { icon: ArrowLeftRight, t: 'Every rupee, categorised', d: 'Log income and expenses with payment method and notes, then search and filter in seconds.' },
@@ -239,9 +239,19 @@ export default function Landing() {
 
           <div className="mt-4 h-48" role="img" aria-label="Sample chart of monthly spending over six months">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={sample}>
+              <AreaChart
+                data={sample}
+                margin={{ top: 10, right: 10, left: 10, bottom: 5 }}
+              >
                 <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFA500" stopOpacity={0.6} /><stop offset="100%" stopColor="#FFA500" stopOpacity={0} /></linearGradient></defs>
-                <XAxis dataKey="m" tickLine={false} axisLine={false} tick={{ fill: '#737373', fontSize: 12 }} />
+                <XAxis
+                  dataKey="m"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: '#737373', fontSize: 12 }}
+                  interval={0}
+                  padding={{ left: 10, right: 10 }}
+                />
                 <Tooltip formatter={(v: number) => formatINR(v)} contentStyle={{ background: 'rgb(var(--card))', color: 'rgb(var(--ink))', border: '1px solid rgb(var(--line) / var(--line-a))', borderRadius: 12 }} />
                 <Area type="monotone" dataKey="v" stroke="#FFA500" strokeWidth={2} fill="url(#g)" animationDuration={1400} />
               </AreaChart>
@@ -271,7 +281,7 @@ export default function Landing() {
         </div>
       </section>
 
-      
+
 
       <footer className="relative border-t border-line/10 py-8 text-center text-sm text-mute">&copy; 2026 SpendWise by Basu.</footer>
     </div>
