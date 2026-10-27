@@ -74,12 +74,7 @@ function NavList({
 
                 <span className="flex-1">{label}</span>
 
-                {featured && (
-                  <span className="inline-flex items-center gap-1 rounded-md bg-orange-500/10 px-1.5 py-1 text-[9px] font-bold tracking-wide text-orange-600 dark:text-orange-400">
-                    <Sparkles size={10} />
-                    AI
-                  </span>
-                )}
+               
 
                 {isActive && <ChevronRight size={14} className="text-orange-500" />}
               </>

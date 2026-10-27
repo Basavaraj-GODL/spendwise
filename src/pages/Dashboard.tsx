@@ -93,7 +93,7 @@ export default function Dashboard() {
       .select('id, amount_paise, type, category, transaction_date')
       .eq('user_id', userData.user.id)
       .order('transaction_date', { ascending: false })
-      console.log('Logged-in user ID:', userData.user.id)
+    console.log('Logged-in user ID:', userData.user.id)
 
     if (queryError) {
       setError('Could not load your transactions. Please try again.')
@@ -115,13 +115,13 @@ export default function Dashboard() {
     const balancePaise = incomePaise - expensePaise
     console.log('Income rows:', rows.filter(item => item.type === 'income'))
     console.log('Total income in paise:', incomePaise)
-    console.log('Total income in rupees:', incomePaise )
+    console.log('Total income in rupees:', incomePaise)
 
     setTotals({
-      balance: balancePaise ,
-      income: incomePaise ,
-      expenses: expensePaise ,
-      savings: balancePaise ,
+      balance: balancePaise,
+      income: incomePaise,
+      expenses: expensePaise,
+      savings: balancePaise,
     })
 
     setLoading(false)
@@ -198,10 +198,6 @@ export default function Dashboard() {
         className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end"
       >
         <motion.div variants={cardMotion}>
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-card px-3 py-1.5 text-xs font-semibold text-[#F97316] shadow-sm">
-            <span className="size-2 animate-pulse rounded-full bg-[#F97316]" />
-            YOUR PERSONAL FINANCE SPACE
-          </div>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Good things start with <span className="text-[#F97316]">clarity.</span>
           </h1>
@@ -305,15 +301,13 @@ export default function Dashboard() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-sm font-semibold text-[#F97316]">
-                <Activity size={17} />
+
                 FINANCIAL ACTIVITY
               </div>
               <h2 className="mt-2 text-xl font-bold">Your money overview</h2>
               <p className="mt-1 text-sm text-mute">A simple look at money coming in and going out.</p>
             </div>
-            <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-orange-500/10 text-[#F97316]">
-              <Sparkles size={20} />
-            </span>
+          
           </div>
 
           <div className="mt-8 rounded-2xl bg-base p-5">

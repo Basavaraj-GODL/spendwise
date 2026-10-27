@@ -129,9 +129,6 @@ export default function Analytics() {
     <div className="w-full min-w-0 space-y-4 sm:space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-mute">
-            YOUR MONEY, YOUR CONTROL
-          </p>
           <h1 className="mt-2 text-2xl font-semibold text-ink sm:text-3xl">
             Spending Analytics
           </h1>
@@ -140,9 +137,18 @@ export default function Analytics() {
           </p>
         </div>
 
-        <button onClick={() => void loadTransactions()} className="btn btn-secondary">
-          <RefreshCw size={16} /> Refresh
-        </button>
+        <button
+            type="button"
+            onClick={() => void loadTransactions()}
+            disabled={loading}
+            aria-label="Refresh dashboard"
+            className="grid size-11 place-items-center rounded-full border border-line/[var(--line-a)] bg-card text-mute shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-300 hover:bg-orange-500/100/10 hover:text-[#F97316] hover:shadow-md disabled:opacity-50"
+          >
+            <RefreshCw
+              size={17}
+              className={loading ? 'animate-spin text-[#F97316]' : 'transition-transform duration-300 hover:rotate-45'}
+            />
+          </button>
       </div>
 
       {error && (

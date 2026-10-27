@@ -62,7 +62,6 @@ export default function Transactions() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setMessage('')
-
     const rupees = Number(amount)
     const paise = Math.round(rupees * 100)
 
@@ -231,7 +230,7 @@ export default function Transactions() {
                   className="install-btn__mask-circle"
                   cx="50"
                   cy="50"
-                  r="42"
+                  r="20"
                   strokeDasharray="39.2 13.6"
                   strokeLinecap="round"
                 />
@@ -242,7 +241,7 @@ export default function Transactions() {
               className="install-btn__track"
               cx="50"
               cy="50"
-              r="42"
+              r="20"
               strokeDasharray="39.2 13.6"
               strokeLinecap="round"
             />
@@ -251,7 +250,7 @@ export default function Transactions() {
               className="install-btn__fill"
               cx="50"
               cy="50"
-              r="42"
+              r="20"
               mask="url(#install-mask)"
             />
           </svg>
@@ -280,7 +279,6 @@ export default function Transactions() {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="mb-5 flex items-center gap-2">
-            <Plus size={20} className="text-cyan" />
             <h2 className="font-display text-lg font-semibold">
               Add transaction
             </h2>
@@ -313,7 +311,7 @@ export default function Transactions() {
                 placeholder="e.g. Lunch, college fees, salary"
                 maxLength={100}
                 required
-                className="block w-full min-w-0 rounded-xl border border-line/10 bg-base p-3 text-sm text-ink sm:text-base"
+                className="block w-full min-w-0 rounded-xl border border-line/10 bg-base p-3 text-sm text-ink"
               />
             </div>
 
@@ -383,7 +381,6 @@ export default function Transactions() {
               disabled={saving}
               className="btn btn-primary w-full disabled:opacity-60"
             >
-              <Plus size={17} />
               {saving ? 'Saving...' : 'Save transaction'}
             </button>
           </form>
