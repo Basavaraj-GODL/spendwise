@@ -89,8 +89,6 @@ export default function AppShell() {
   const [open, setOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const location = useLocation()
-  const [message, setMessage] = useState('')
-  const [error, setError] = useState('')
 
   useEffect(() => {
     let active = true
@@ -129,18 +127,12 @@ export default function AppShell() {
     )?.label ?? 'SpendWise'
 
   async function signOut() {
-    setError('')
-    setMessage('')
-
     const confirmed = window.confirm('Are you sure you want to sign out?')
     if (!confirmed) return
 
     const { error } = await supabase.auth.signOut()
 
-    if (error) {
-      setError(error.message)
-      return
-    }
+    if (error) return
 
     window.location.assign('/login')
   }
