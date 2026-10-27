@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import Logo from '../components/Logo'
 import ThemeToggle from '../components/ThemeToggle'
+import { supabase } from '../supabase'
 
 const nav = [
   { to: '/app', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -21,69 +22,107 @@ const nav = [
   { to: '/app/analytics', label: 'Analytics', icon: ChartNoAxesCombined },
   { to: '/app/ai-scan', label: 'AI Scan', icon: ScanLine, featured: true },
   { to: '/app/settings', label: 'Settings', icon: Settings },
+  { to: '/app/admin', label: 'Admin Dashboard', icon: LayoutDashboard, adminOnly: true },
 ]
-
-function NavList({ onNavigate }: { onNavigate?: () => void }) {
+function NavList({
+  onNavigate,
+  isAdmin,
+}: {
+  onNavigate?: () => void
+  isAdmin: boolean
+}) {
   return (
     <nav aria-label="Main navigation" className="flex flex-col gap-1.5">
       <p className="mb-2 mt-2 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-mute">
         Workspace
       </p>
 
-      {nav.map(({ to, label, icon: Icon, end, featured }) => (
-        <NavLink
-          key={to}
-          to={to}
-          end={end}
-          onClick={onNavigate}
-          className={({ isActive }) =>
-            `group relative flex items-center gap-3 overflow-hidden rounded-full px-3.5 py-3 text-[13px] font-medium transition-all duration-200 ${isActive
-              ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
-              : 'text-mute hover:bg-black/[0.035] hover:text-ink dark:hover:bg-white/[0.06]'
-            }`
-          }
-        >
-          {({ isActive }) => (
-            <>
-              <motion.span
-                layoutId="spendwise-active-nav"
-                className="absolute inset-0 z-0 rounded-full border border-orange-500/20 bg-orange-500/[0.08]"
-                transition={{
-                  type: 'spring',
-                  stiffness: 380,
-                  damping: 32,
-                }}
-                aria-hidden="true"
-              />
+      {nav
+        .filter(item => !item.adminOnly || isAdmin)
+        .map(({ to, label, icon: Icon, end, featured }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={end}
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              `group relative flex items-center gap-3 overflow-hidden rounded-full px-3.5 py-3 text-[13px] font-medium transition-all duration-200 ${isActive
+                ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
+                : 'text-mute hover:bg-black/[0.035] hover:text-ink dark:hover:bg-white/[0.06]'
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <motion.span
+                  layoutId="spendwise-active-nav"
+                  className="absolute inset-0 z-0 rounded-full border border-orange-500/20 bg-orange-500/[0.08]"
+                  transition={{
+                    type: 'spring',
+                    stiffness: 380,
+                    damping: 32,
+                  }}
+                  aria-hidden="true"
+                />
 
-              <Icon
-                size={18}
-                strokeWidth={isActive ? 2.2 : 1.8}
-                className={`shrink-0 transition-colors ${isActive ? 'text-orange-500' : 'text-mute group-hover:text-orange-500'
-                  }`}
-              />
+                <Icon
+                  size={18}
+                  strokeWidth={isActive ? 2.2 : 1.8}
+                  className={`shrink-0 transition-colors ${isActive ? 'text-orange-500' : 'text-mute group-hover:text-orange-500'
+                    }`}
+                />
 
-              <span className="flex-1">{label}</span>
+                <span className="flex-1">{label}</span>
 
-              {featured && (
-                <span className="inline-flex items-center gap-1 rounded-md bg-orange-500/10 px-1.5 py-1 text-[9px] font-bold tracking-wide text-orange-600 dark:text-orange-400">
-                  <Sparkles size={10} />
-                  AI
-                </span>
-              )}
+                {featured && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-orange-500/10 px-1.5 py-1 text-[9px] font-bold tracking-wide text-orange-600 dark:text-orange-400">
+                    <Sparkles size={10} />
+                    AI
+                  </span>
+                )}
 
-              {isActive && <ChevronRight size={14} className="text-orange-500" />}
-            </>
-          )}
-        </NavLink>
-      ))}
+                {isActive && <ChevronRight size={14} className="text-orange-500" />}
+              </>
+            )}
+          </NavLink>
+        ))}
     </nav>
   )
 }
 
 export default function AppShell() {
   const [open, setOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const location = useLocation()
+
+  useEffect(() => {
+    let active = true
+
+    async function checkAdminRole() {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (!user) {
+        if (active) setIsAdmin(false)
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (active) {
+        setIsAdmin(!error && data?.role === 'admin')
+      }
+    }
+
+    checkAdminRole()
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   const currentPage =
     nav.find(item =>
@@ -100,9 +139,9 @@ export default function AppShell() {
           <Logo />
         </div>
 
-        <NavList />
+        <NavList isAdmin={isAdmin} />
 
-        
+
       </aside>
 
       {/* Main content */}
@@ -191,7 +230,10 @@ export default function AppShell() {
                 </button>
               </div>
 
-              <NavList onNavigate={() => setOpen(false)} />
+              <NavList
+                isAdmin={isAdmin}
+                onNavigate={() => setOpen(false)}
+              />
 
               <div className="mt-auto border-t border-line/[var(--line-a)] pt-4">
                 <p className="text-xs text-mute">SpendWise · Personal Finance</p>
