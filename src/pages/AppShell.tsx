@@ -39,7 +39,7 @@ function NavList({
 
       {nav
         .filter(item => !item.adminOnly || isAdmin)
-        .map(({ to, label, icon: Icon, end, }) => (
+        .map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
