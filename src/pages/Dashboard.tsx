@@ -9,9 +9,7 @@ import {
   ArrowRight,
   Plus,
   RefreshCw,
-  Sparkles,
   CalendarDays,
-  Activity,
   ArrowUpRight,
 } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
