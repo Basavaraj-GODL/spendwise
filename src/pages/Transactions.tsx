@@ -1,7 +1,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Trash2, ArrowLeftRight } from 'lucide-react'
+import { Trash2, ArrowLeftRight } from 'lucide-react'
 import { supabase } from '../supabase'
 import { formatINR } from '../lib/format'
 import LoadingAnimation from '../components/Loader.tsx'
