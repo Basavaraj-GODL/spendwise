@@ -10,7 +10,6 @@ import {
   Menu,
   X,
   ChevronRight,
-  LogOut,
 } from 'lucide-react'
 import Logo from '../components/Logo'
 import ThemeToggle from '../components/ThemeToggle'
