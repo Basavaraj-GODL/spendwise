@@ -230,7 +230,7 @@ export default function Transactions() {
                   className="install-btn__mask-circle"
                   cx="50"
                   cy="50"
-                  r="20"
+                  r="42"
                   strokeDasharray="39.2 13.6"
                   strokeLinecap="round"
                 />
@@ -241,7 +241,7 @@ export default function Transactions() {
               className="install-btn__track"
               cx="50"
               cy="50"
-              r="20"
+              r="42"
               strokeDasharray="39.2 13.6"
               strokeLinecap="round"
             />
@@ -250,7 +250,7 @@ export default function Transactions() {
               className="install-btn__fill"
               cx="50"
               cy="50"
-              r="20"
+              r="42"
               mask="url(#install-mask)"
             />
           </svg>

@@ -82,10 +82,6 @@ export default function Signup() {
 
       <section className="signup-layout">
         <div className="signup-intro">
-          <div className="eyebrow">
-            <span /> YOUR MONEY. YOUR CONTROL.
-          </div>
-
           <h1>
             Make every
             <br />
@@ -122,16 +118,12 @@ export default function Signup() {
               </div>
             </div>
           </div>
-
-          <div className="intro-footer">
-            A little more clarity. A lot more confidence.
-          </div>
         </div>
 
         <div className="signup-card">
           <div className="card-topline">
             <span>GET STARTED</span>
-            <span>01 / 02</span>
+
           </div>
 
           <h2>Create your account</h2>
@@ -233,10 +225,6 @@ export default function Signup() {
 
           <p className="login-prompt">
             Already have an account? <Link to="/login">Log in</Link>
-          </p>
-
-          <p className="terms-note">
-            Your financial journey. Your own space.
           </p>
         </div>
       </section>

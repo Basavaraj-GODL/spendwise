@@ -10,7 +10,8 @@ import {
   Menu,
   X,
   ChevronRight,
-  Sparkles,
+  LogOut,
+  AlignRight
 } from 'lucide-react'
 import Logo from '../components/Logo'
 import ThemeToggle from '../components/ThemeToggle'
@@ -39,7 +40,7 @@ function NavList({
 
       {nav
         .filter(item => !item.adminOnly || isAdmin)
-        .map(({ to, label, icon: Icon, end, featured }) => (
+        .map(({ to, label, icon: Icon, end, }) => (
           <NavLink
             key={to}
             to={to}
@@ -74,7 +75,7 @@ function NavList({
 
                 <span className="flex-1">{label}</span>
 
-               
+
 
                 {isActive && <ChevronRight size={14} className="text-orange-500" />}
               </>
@@ -89,6 +90,8 @@ export default function AppShell() {
   const [open, setOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const location = useLocation()
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
 
   useEffect(() => {
     let active = true
@@ -125,6 +128,23 @@ export default function AppShell() {
         ? location.pathname === item.to
         : location.pathname.startsWith(item.to)
     )?.label ?? 'SpendWise'
+
+  async function signOut() {
+    setError('')
+    setMessage('')
+
+    const confirmed = window.confirm('Are you sure you want to sign out?')
+    if (!confirmed) return
+
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+      setError(error.message)
+      return
+    }
+
+    window.location.assign('/login')
+  }
 
   return (
     <div className="min-h-screen w-full min-w-0 bg-base text-ink lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
@@ -165,11 +185,13 @@ export default function AppShell() {
               </h1>
             </div>
           </div>
-
-          <div className="flex items-center gap-3">
-            <span className="hidden rounded-full border border-line/[var(--line-a)] bg-card px-3 py-1.5 text-[11px] font-medium text-mute sm:inline-flex">
-              Personal finance
-            </span>
+          <div className="flex gap-7">
+            <button id="btn-sign-out" type="button" onClick={() => void signOut()}>
+              <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                Sign out
+                <LogOut size={16} />
+              </span>
+            </button>
             <ThemeToggle />
           </div>
         </header>
