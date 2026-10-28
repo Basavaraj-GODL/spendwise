@@ -1,7 +1,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react'
 import { motion } from 'framer-motion'
-import { UserRound, ShieldCheck, LockKeyhole, LogOut, Save, Mail } from 'lucide-react'
+import { UserRound, ShieldCheck, Mail } from 'lucide-react'
 import { supabase } from '../supabase'
 
 export default function Settings() {
@@ -88,23 +88,6 @@ export default function Settings() {
     setMessage('Password updated successfully!')
   }
 
-  async function signOut() {
-    setError('')
-    setMessage('')
-
-    const confirmed = window.confirm('Are you sure you want to sign out?')
-    if (!confirmed) return
-
-    const { error } = await supabase.auth.signOut()
-
-    if (error) {
-      setError(error.message)
-      return
-    }
-
-    window.location.assign('/login')
-  }
-
   if (loading) {
     return (
       <div className="glass rounded-2xl p-8 text-center text-mute">
@@ -116,9 +99,6 @@ export default function Settings() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-mute">
-          YOUR ACCOUNT
-        </p>
         <h1 className="mt-2 text-3xl font-semibold text-ink">Settings</h1>
         <p className="mt-2 text-sm text-mute">
           Manage your profile and keep your account secure.
@@ -148,7 +128,6 @@ export default function Settings() {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-ink">Profile</h2>
-            <p className="text-sm text-mute">Update your display name.</p>
           </div>
         </div>
 
@@ -159,9 +138,6 @@ export default function Settings() {
               <Mail size={17} className="text-mute" />
               <span className="break-all text-ink">{email || 'No email available'}</span>
             </div>
-            <p className="mt-2 text-xs text-mute">
-              Your email is read-only here.
-            </p>
           </label>
 
           <label className="block text-sm text-mute">
@@ -176,7 +152,6 @@ export default function Settings() {
           </label>
 
           <button type="submit" disabled={savingProfile} className="btn btn-primary">
-            <Save size={16} />
             {savingProfile ? 'Saving...' : 'Save profile'}
           </button>
         </form>
@@ -194,7 +169,6 @@ export default function Settings() {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-ink">Security</h2>
-            <p className="text-sm text-mute">Choose a new password for your account.</p>
           </div>
         </div>
 
@@ -228,29 +202,9 @@ export default function Settings() {
           </label>
 
           <button type="submit" disabled={savingPassword} className="btn btn-primary">
-            <LockKeyhole size={16} />
             {savingPassword ? 'Updating...' : 'Update password'}
           </button>
         </form>
-      </motion.section>
-
-      <motion.section
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="glass rounded-2xl border border-rose-400/20 p-5 sm:p-6"
-      >
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-ink">Sign out</h2>
-            <p className="mt-1 text-sm text-mute">
-              Sign out of your current SpendWise account on this device.
-            </p>
-          </div>
-          <button type="button" onClick={() => void signOut()} className="btn btn-secondary">
-            <LogOut size={16} /> Sign out
-          </button>
-        </div>
       </motion.section>
     </div>
   )

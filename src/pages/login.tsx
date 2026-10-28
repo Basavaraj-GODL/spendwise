@@ -70,10 +70,6 @@ async function handleGoogleLogin() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
         >
-          <div className="eyebrow">
-            <span /> WELCOME BACK
-          </div>
-
           <h1>
             Your money.
             <br />
@@ -110,10 +106,6 @@ async function handleGoogleLogin() {
               </div>
             </div>
           </div>
-
-          <div className="intro-footer">
-            A little more clarity. A lot more confidence.
-          </div>
         </motion.div>
 
         <motion.div
@@ -124,9 +116,7 @@ async function handleGoogleLogin() {
         >
           <div className="card-topline">
             <span>YOUR ACCOUNT</span>
-            <span>02 / 02</span>
           </div>
-
           <h2>Welcome back</h2>
           <p className="card-subtitle">
             Log in to continue to your account.
@@ -192,10 +182,6 @@ async function handleGoogleLogin() {
 
           <p className="login-prompt">
             Don't have an account? <Link to="/signup">Sign up</Link>
-          </p>
-
-          <p className="terms-note">
-            Your financial journey. Your own space.
           </p>
         </motion.div>
       </section>

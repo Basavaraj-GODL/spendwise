@@ -125,6 +125,17 @@ export default function AppShell() {
         : location.pathname.startsWith(item.to)
     )?.label ?? 'SpendWise'
 
+  async function signOut() {
+    const confirmed = window.confirm('Are you sure you want to sign out?')
+    if (!confirmed) return
+
+    const { error } = await supabase.auth.signOut()
+
+    if (error) return
+
+    window.location.assign('/login')
+  }
+
   return (
     <div className="min-h-screen w-full min-w-0 bg-base text-ink lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
       {/* Desktop sidebar */}
@@ -164,11 +175,13 @@ export default function AppShell() {
               </h1>
             </div>
           </div>
-
-          <div className="flex items-center gap-3">
-            <span className="hidden rounded-full border border-line/[var(--line-a)] bg-card px-3 py-1.5 text-[11px] font-medium text-mute sm:inline-flex">
-              Personal finance
-            </span>
+          <div className="flex gap-7">
+            <button id="btn-sign-out" type="button" onClick={() => void signOut()}>
+              <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                Sign out
+                <LogOut size={16} />
+              </span>
+            </button>
             <ThemeToggle />
           </div>
         </header>

@@ -54,7 +54,6 @@ export default function AdminDashboard() {
   return (
     <div className="w-full min-w-0 space-y-6">
       <div>
-        <p className="text-sm text-mute">SpendWise / Administration</p>
         <h1 className="mt-2 font-display text-2xl font-bold text-ink sm:text-3xl">
           Admin Dashboard
         </h1>
