@@ -72,6 +72,7 @@ export default function Dashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [displayName, setDisplayName] = useState('there')
 
   const loadDashboard = useCallback(async () => {
     setLoading(true)
@@ -85,6 +86,16 @@ export default function Dashboard() {
       setLoading(false)
       return
     }
+    const user = userData.user
+
+    const name =
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      user.user_metadata?.display_name ||
+      user.email?.split('@')[0] ||
+      'there'
+
+    setDisplayName(String(name).trim() || 'there')
 
     const { data, error: queryError } = await supabase
       .from('transactions')
@@ -197,7 +208,8 @@ export default function Dashboard() {
       >
         <motion.div variants={cardMotion}>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Good things start with <span className="text-[#F97316]">clarity.</span>
+            Welcome back,{' '}
+            <span className="text-[#F97316]">{displayName}!</span>
           </h1>
           <p className="mt-2 text-sm text-mute">
             Your money at a glance. Make every rupee count.
@@ -305,7 +317,7 @@ export default function Dashboard() {
               <h2 className="mt-2 text-xl font-bold">Your money overview</h2>
               <p className="mt-1 text-sm text-mute">A simple look at money coming in and going out.</p>
             </div>
-          
+
           </div>
 
           <div className="mt-8 rounded-2xl bg-base p-5">
