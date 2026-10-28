@@ -87,7 +87,7 @@ export default function Landing() {
               Start tracking free
             </Link>
             <Link
-              to="/app"
+              to="/login"
               className="btn btn-ghost flex w-full items-center justify-center text-center sm:w-auto"
             >
               Explore the dashboard
