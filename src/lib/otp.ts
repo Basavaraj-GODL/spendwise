@@ -1,6 +1,6 @@
 import { Textbee } from '@textbee/sdk'
 
-const textbee = new Textbee({ apiKey: import.meta.env.VITE_TEXTBEE_API_KEY })
+
 
 const OTP_KEY = 'pending_otp'
 const SIGNUP_KEY = 'pending_signup'
@@ -36,6 +36,10 @@ export async function sendOtp(phone: string) {
   }
 
   const otp = generateOtp()
+
+  const textbee = new Textbee({
+    apiKey: import.meta.env.VITE_TEXTBEE_API_KEY,
+  })
 
   const result = await textbee.sendSms({
     deviceId: import.meta.env.VITE_TEXTBEE_DEVICE_ID,
