@@ -819,7 +819,7 @@ export default function AIScan() {
             Upload an individual payment screenshot. SpendWise will suggest
             transaction details for you to review before saving.
           </p>
-          <p id='ai-note' className="mt-5 text-xs leading-5 text-mute">
+          <p id='ai-note' className="mt-3 max-w-xl text-sm leading-6 text-mute">
             Note : <br /> <br />
             <p>"The screenshot is processed using browser OCR. Review all suggested <br />
             details carefully. Only confirmed transaction fields are sent to <br />

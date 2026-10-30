@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",
+    "@textbee/sdk": "^0.4.0",
     "framer-motion": "11.11.17",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.9",

@@ -11,7 +11,7 @@ import Analytics from './pages/Analytics'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import AdminDashboard from './pages/AdminDashboard'
-
+import VerifyOtp from './pages/VerifyOtp'
 export default function App() {
   return (
     <Routes>
@@ -27,6 +27,7 @@ export default function App() {
         <Route path="settings" element={<Settings />} />
         <Route path="admin" element={<AdminDashboard />} />
       </Route>
+      <Route path="/verify-otp" element={<VerifyOtp />} />
       <Route path="*" element={<Unavailable title="Page not found" stage="" />} />
     </Routes>
   )

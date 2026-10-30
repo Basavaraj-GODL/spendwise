@@ -1,12 +1,14 @@
-
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import Logo from '../components/Logo'
+import { sendOtp, normalizePhone, savePendingSignup } from '../lib/otp'
 
 export default function Signup() {
+  const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [message, setMessage] = useState('')
@@ -17,11 +19,15 @@ export default function Signup() {
     e.preventDefault()
     setMessage('')
 
+    const formattedPhone = normalizePhone(phone)
+    if (!formattedPhone) {
+      setMessage('Enter a valid 10-digit mobile number.')
+      return
+    }
     if (password.length < 8) {
       setMessage('Password must be at least 8 characters.')
       return
     }
-
     if (password !== confirmPassword) {
       setMessage('Passwords do not match.')
       return
@@ -29,31 +35,25 @@ export default function Signup() {
 
     setLoading(true)
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: name.trim(),
-          display_name: name.trim(),
-        },
-      },
-    })
-
-    setLoading(false)
-
-    if (error) {
-      setMessage(error.message)
+    try {
+      await sendOtp(formattedPhone)
+    } catch (err) {
+      console.error('SMS error:', err)
+      setLoading(false)
+      setMessage(err instanceof Error ? err.message : 'Could not send the OTP.')
       return
     }
 
-    if (data.session) {
-      window.location.href = '/app'
-    } else {
-      setMessage('Account created! Check your email to confirm your account.')
-    }
-  }
+    savePendingSignup({
+      name: name.trim(),
+      email: email.trim(),
+      password,
+      phone: formattedPhone,
+    })
 
+    setLoading(false)
+    navigate('/verify-otp')
+  }
 
   async function handleGoogleSignup() {
     setMessage('')
@@ -74,7 +74,6 @@ export default function Signup() {
       setGoogleLoading(false)
     }
   }
-
 
   return (
     <main className="signup-page">
@@ -128,7 +127,6 @@ export default function Signup() {
         <div className="signup-card">
           <div className="card-topline">
             <span>GET STARTED</span>
-
           </div>
 
           <h2>Create your account</h2>
@@ -158,6 +156,17 @@ export default function Signup() {
               autoComplete="email"
             />
 
+            <label htmlFor="phone">Mobile number</label>
+            <input
+              id="phone"
+              type="tel"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              placeholder="10-digit mobile number"
+              required
+              autoComplete="tel"
+            />
+
             <label htmlFor="password">Password</label>
             <input
               id="password"
@@ -182,7 +191,7 @@ export default function Signup() {
             />
 
             <button type="submit" disabled={loading || googleLoading}>
-              {loading ? 'Creating your account…' : 'Create account  →'}
+              {loading ? 'Sending OTP…' : 'Create account  →'}
             </button>
           </form>
 

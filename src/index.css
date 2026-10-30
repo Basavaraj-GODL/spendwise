@@ -892,13 +892,13 @@ html[data-theme-anim="1"]::view-transition-new(root) {
   width: fit-content;
   border-radius: 20px;
   padding: 15px;
-  color: #ffffff;
+  color: rgb(var(--mute) / var(--tw-text-opacity, 1));;
   background-color: #ff000000;
 }
 #ai-note p {
-  color: #ffffff;
+  color: rgb(var(--mute) / var(--tw-text-opacity, 1));;
   padding: 15px;
   background-color: #ffffff00;
   border-radius: 20px;
-  box-shadow: 0px 0px 10px #eae6e4;
+  box-shadow: 0px 0px 10px rgb(var(--mute) / var(--tw-text-opacity, 1));;
 }
