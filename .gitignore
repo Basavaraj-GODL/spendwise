@@ -4,6 +4,17 @@ dist
 .env.*
 .vercel
 
+# Supabase
+/supabase/
+.branches
+.temp
+
+# dotenvx
+.env.keys
+.env.local
+.env.*.local
+
 *.tsbuildinfo
-spendwise/supabase
-spendwise/.vscode
+*supabase/
+*.vscode/
+/.vscode/
