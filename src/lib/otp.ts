@@ -10,7 +10,7 @@ export interface PendingSignup {
   name: string
   email: string
   password: string
-  phone: string // already normalised, e.g. +919876543210
+  phone: string 
 }
 
 // Accepts "9876543210", "+919876543210", "91 98765 43210" -> "+919876543210"

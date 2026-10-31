@@ -5,3 +5,5 @@ dist
 .vercel
 
 *.tsbuildinfo
+spendwise/supabase
+spendwise/.vscode
